@@ -8,8 +8,11 @@ import {
   Stack,
 } from '@mui/material';
 import { loginUser, registerUser } from '../utils/auth';
+// import { getSocket } from '../utils/socket';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterLoginForm = () => {
+  const navigate = useNavigate();
   const [formType, setFormType] = useState('login'); // 'login' or 'register'
   const [formData, setFormData] = useState({
     name: '',
@@ -25,9 +28,20 @@ const RegisterLoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(`${formType === 'register' ? 'Registering' : 'Logging in'}:`, formData);
       formType === 'register' ? await registerUser(formData) : loginUser(formData);
       alert(`${formType === 'register' ? 'Registered' : 'Logged in'} successfully!`);
+
+      if (formType === 'login') {
+        navigate('/');
+        // const socket = getSocket();
+        // socket.on('connect', () => {
+        //   console.log('Navigating to HomePage');
+        //   navigate('/');
+        // });
+      } else {
+        alert('Registered successfully!');
+      }
+
     } catch (error) {
       console.error('Error during API call:', error);
       alert(`Error: ${error.response ? error.response.data.message : 'Network error'}`);

@@ -1,10 +1,11 @@
 import './App.css';
-import RegisterLoginForm from './pages/LoginPage';
+import AppRoutes from './pages/AppRoutes';
+
 
 function App() {
   return (
     <div className="App">
-      <RegisterLoginForm/>
+      <AppRoutes/>
     </div>
   );
 }
