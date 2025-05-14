@@ -33,11 +33,6 @@ const RegisterLoginForm = () => {
 
       if (formType === 'login') {
         navigate('/');
-        // const socket = getSocket();
-        // socket.on('connect', () => {
-        //   console.log('Navigating to HomePage');
-        //   navigate('/');
-        // });
       } else {
         alert('Registered successfully!');
       }

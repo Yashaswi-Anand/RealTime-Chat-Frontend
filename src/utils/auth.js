@@ -35,38 +35,3 @@ export const fetchAllUsers = async (token) => {
     });
     return response.data.data; // contains users and unseenMessage
 };
-
-
-/*
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    const socket = getSocket();
-
-    // 2. Listen for online users
-    socket.on('getOnlineUsers', (onlineUserIds) => {
-      setOnlineUsers(onlineUserIds);
-    });
-
-    // 3. Request current online users (optional, but ensures we get the latest)
-    socket.emit('requestOnlineUsers');
-
-    // 4. Fetch all users
-    fetchAllUsers(token)
-      .then(data => {
-        setUsers(data.users);
-        setUnseenMessages(data.unseenMessage);
-      })
-      .catch(err => {
-        console.error('Failed to fetch users:', err);
-      });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-
-
-*/

@@ -3,6 +3,7 @@ import { Box, Typography, TextField, List, ListItem, ListItemAvatar, ListItemTex
 import SendIcon from '@mui/icons-material/Send';
 import SearchIcon from '@mui/icons-material/Search';
 import { getSocket } from '../utils/socket';
+import { fetchAllUsers } from '../utils/auth';
 
 const HomePage = () => {
   const [users, setUsers] = useState([]);
@@ -16,26 +17,50 @@ const HomePage = () => {
     { senderId: 1, content: 'Lorem Ipsum is placeholder text commonly used in the graphic, print, and publishing.', time: '5:10 PM' },
   ]);
 
-
   useEffect(() => {
-    const socket = getSocket();
-    console.log('Socket connected:', socket.id);
+    (async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in first.');
+        return;
+      }
 
+      try {
+        const response = await fetchAllUsers(token);
+        const { users, unseenMessage } = response;
+        setUsers(users);
+        setUnseenMessages(unseenMessage);
+      } catch (error) {
+        setMessages([]);
+        console.error('Failed to fetch users:', error);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    const socket = getSocket();
-    if (selectedUserId) {
-      socket.emit('getMessages', selectedUserId);
-      socket.on('messageHistory', (msgs) => {
-        setMessages(msgs);
-      });
-    }
+    const interval = setInterval(() => {
+      const socket = getSocket();
+      if (socket) {
+        console.log("Socket connected:", socket.id);
+
+        socket.on("getOnlineUsers", (users) => {
+          console.log("Online Users:", users);
+          setOnlineUsers(users);
+        });
+
+        // Request online users manually (optional)
+        socket.emit("requestOnlineUsers");
+
+        clearInterval(interval); // Stop checking once socket is available
+      }
+    }, 500); // Check every 0.5 seconds until socket is ready
 
     return () => {
-      socket.off('messageHistory');
+      const socket = getSocket();
+      if (socket) socket.off("getOnlineUsers");
+      clearInterval(interval);
     };
-  }, [selectedUserId]);
+  }, []);
 
   const handleSendMessage = () => {
     const socket = getSocket();
@@ -48,8 +73,9 @@ const HomePage = () => {
     }
   };
 
-
-  const selectedUser = users.find(user => user.id === selectedUserId);
+  console.log('Selected User ID:', selectedUserId, users);
+  const selectedUser = users.find(user => user._id === selectedUserId);
+  console.log('Selected User ID:', selectedUser,  selectedUserId, users);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
@@ -72,11 +98,11 @@ const HomePage = () => {
         <List>
           {users.map(user => (
             <ListItem
-              key={user.id}
-              onClick={() => setSelectedUserId(user.id)}
+              key={user._id}
+              onClick={() => setSelectedUserId(user._id)}
               sx={{
                 borderRadius: 2,
-                backgroundColor: selectedUserId === user.id ? '#2f2f40' : 'transparent',
+                backgroundColor: selectedUserId === user._id ? '#2f2f40' : 'transparent',
                 mb: 1,
                 cursor: 'pointer'
               }}
@@ -85,7 +111,7 @@ const HomePage = () => {
                 <Badge
                   variant="dot"
                   color="success"
-                  invisible={!onlineUsers.includes(user.id)}
+                  invisible={!onlineUsers.includes(user._id)}
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
                   <Avatar alt={user.name} src={user.avatar} />
@@ -93,10 +119,10 @@ const HomePage = () => {
               </ListItemAvatar>
               <ListItemText
                 primary={<Typography sx={{ color: '#fff' }}>{user.name}</Typography>}
-                secondary={<Typography sx={{ color: onlineUsers.includes(user.id) ? 'limegreen' : 'gray' }}>{onlineUsers.includes(user.id) ? 'Online' : 'Offline'}</Typography>}
+                secondary={<Typography sx={{ color: onlineUsers.includes(user._id) ? 'limegreen' : 'gray' }}>{onlineUsers.includes(user._id) ? 'Online' : 'Offline'}</Typography>}
               />
               {unseenMessages[user.id] > 0 && (
-                <Badge badgeContent={unseenMessages[user.id]} color="secondary" />
+                <Badge badgeContent={unseenMessages[user._id]} color="secondary" />
               )}
             </ListItem>
           ))}
