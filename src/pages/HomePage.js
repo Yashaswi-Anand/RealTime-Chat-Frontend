@@ -75,14 +75,14 @@ const HomePage = () => {
 
   console.log('Selected User ID:', selectedUserId, users);
   const selectedUser = users.find(user => user._id === selectedUserId);
-  console.log('Selected User ID:', selectedUser,  selectedUserId, users);
+  console.log('Selected User ID:', selectedUser, selectedUserId, users);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
       {/* Sidebar */}
       <Box sx={{ width: 300, background: '#141416', color: '#fff', p: 2 }}>
         <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box component="span" sx={{ fontWeight: 'bold', color: '#b57bff' }}>💬 QuickChat</Box>
+          <Box component="span" sx={{ fontWeight: 'bold', color: '#b57bff' }}>💬 Real Chat</Box>
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
@@ -130,51 +130,57 @@ const HomePage = () => {
       </Box>
 
       {/* Chat Window */}
-      <Box sx={{ flexGrow: 1, background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', p: 2, display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} />}
-          <Typography variant="h6" sx={{ color: '#fff' }}>{selectedUser?.name}</Typography>
-          {selectedUser && onlineUsers.includes(selectedUser.id) && <Typography sx={{ color: 'limegreen', ml: 1 }}>●</Typography>}
+      {selectedUserId ?
+        <Box sx={{ flexGrow: 1, background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', p: 2, display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} />}
+            <Typography variant="h6" sx={{ color: '#fff' }}>{selectedUser?.name}</Typography>
+            {selectedUser && onlineUsers.includes(selectedUser.id) && <Typography sx={{ color: 'limegreen', ml: 1 }}>●</Typography>}
+          </Box>
+
+          <Divider sx={{ background: '#333' }} />
+
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
+            {messages && messages.map((msg, index) => (
+              <Box key={index} sx={{ textAlign: msg.senderId === 1 ? 'right' : 'left', mb: 2 }}>
+                <Paper
+                  sx={{
+                    display: 'inline-block',
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    backgroundColor: msg.senderId === 1 ? '#6e56cf' : '#3a3a4f',
+                    color: '#fff'
+                  }}
+                >
+                  <Typography>{msg.content}</Typography>
+                </Paper>
+                <Typography variant="caption" color="gray" sx={{ mt: 0.5 }}>{msg.time}</Typography>
+              </Box>
+            ))}
+          </Box>
+
+          <Divider sx={{ background: '#333' }} />
+
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
+            <TextField
+              fullWidth
+              placeholder="Send a message"
+              variant="standard"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              InputProps={{ disableUnderline: true, style: { color: 'white' } }}
+            />
+            <IconButton onClick={handleSendMessage}>
+              <SendIcon sx={{ color: '#b57bff' }} />
+            </IconButton>
+          </Box>
         </Box>
-
-        <Divider sx={{ background: '#333' }} />
-
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
-          {messages && messages.map((msg, index) => (
-            <Box key={index} sx={{ textAlign: msg.senderId === 1 ? 'right' : 'left', mb: 2 }}>
-              <Paper
-                sx={{
-                  display: 'inline-block',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  backgroundColor: msg.senderId === 1 ? '#6e56cf' : '#3a3a4f',
-                  color: '#fff'
-                }}
-              >
-                <Typography>{msg.content}</Typography>
-              </Paper>
-              <Typography variant="caption" color="gray" sx={{ mt: 0.5 }}>{msg.time}</Typography>
-            </Box>
-          ))}
-        </Box>
-
-        <Divider sx={{ background: '#333' }} />
-
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
-          <TextField
-            fullWidth
-            placeholder="Send a message"
-            variant="standard"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            InputProps={{ disableUnderline: true, style: { color: 'white' } }}
-          />
-          <IconButton onClick={handleSendMessage}>
-            <SendIcon sx={{ color: '#b57bff' }} />
-          </IconButton>
-        </Box>
-      </Box>
+        : <Box sx={{ background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="h5" sx={{ color: '#fff', textAlign: 'center', mt: 5 }}>
+            Select a user to start chatting!
+          </Typography>
+        </Box>}
     </Box>
   );
 };
