@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, TextField, List, ListItem, ListItemAvatar, ListItemText, Avatar, Badge, IconButton, Paper, Divider } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,6 +14,8 @@ const HomePage = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [filter_users, setFilterUsers] = useState([]);
+  const typingTimeoutRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -113,6 +115,41 @@ const HomePage = () => {
     console.log("Filtered Data:", filter_data);
   };
 
+  // Handle Typing
+  const handleInputChange = (value) => {
+    const socket = getSocket();
+    setMessageInput(value);
+
+    if (selectedUserId && socket) {
+      socket.emit('typing', { receiver_id: selectedUserId });
+
+      // Clear any existing timeout
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+      // Emit stopTyping after 2 seconds of inactivity
+      typingTimeoutRef.current = setTimeout(() => {
+        socket.emit('stopTyping', { receiver_id: selectedUserId });
+      }, 2000);
+    }
+  };
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    socket.on('userTyping', ({ sender_id }) => {
+      if (sender_id === selectedUserId) setIsTyping(true);
+    });
+
+    socket.on('userStoppedTyping', ({ sender_id }) => {
+      if (sender_id === selectedUserId) setIsTyping(false);
+    });
+
+    return () => {
+      socket.off('userTyping');
+      socket.off('userStoppedTyping');
+    };
+  }, [selectedUserId]);
 
   const selectedUser = users.find(user => user._id === selectedUserId);
 
@@ -172,13 +209,31 @@ const HomePage = () => {
       {/* Chat Window */}
       {selectedUserId ?
         <Box sx={{ flexGrow: 1, background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', p: 2, display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} />}
-            <Typography variant="h6" sx={{ color: '#fff' }}>{selectedUser?.name}</Typography>
-            {selectedUser && onlineUsers.includes(selectedUser.id) && <Typography sx={{ color: 'limegreen', ml: 1 }}>●</Typography>}
+          <Box sx={{
+            // flexGrow: 1,
+            // background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+              {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} />}
+              <Box>
+                <Typography variant="h6" sx={{ color: '#fff' }}>
+                  {selectedUser?.name}
+                  {selectedUser && onlineUsers.includes(selectedUser._id) && (
+                    <Typography component="span" sx={{ color: 'limegreen', ml: 1 }}>●</Typography>
+                  )}
+                </Typography>
+                {isTyping && (
+                  <Typography color="#b57bff" variant="caption" style={{ marginLeft: '-25px' }}>
+                    Typing...
+                  </Typography>
+                )}
+              </Box>
+            </Box>
           </Box>
 
-          <Divider sx={{ background: '#333' }} />
+          <Divider sx={{ background: '#3333' }} />
 
           <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
             {messages.length > 0 && messages.map((msg, index) => {
@@ -213,7 +268,7 @@ const HomePage = () => {
               placeholder="Send a message"
               variant="standard"
               value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
+              onChange={(e) => handleInputChange(e.target.value)}
               InputProps={{ disableUnderline: true, style: { color: 'white' } }}
             />
             <IconButton onClick={handleSendMessage}>
