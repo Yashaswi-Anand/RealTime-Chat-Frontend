@@ -7,18 +7,19 @@ import { fetchAllUsers } from '../utils/auth';
 
 const HomePage = () => {
   const [users, setUsers] = useState([]);
+  const [logged_in_user, setLoggedInUser] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messageInput, setMessageInput] = useState('');
   const [unseenMessages, setUnseenMessages] = useState({});
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [messages, setMessages] = useState([
-    { senderId: 1, content: 'Lorem Ipsum is placeholder text commonly used in..', time: '4:20 PM' },
-    { senderId: 2, content: 'Lorem Ipsum is placeholder text commonly used in the graphic, print, and publishing.', time: '5:00 PM' },
-    { senderId: 1, content: 'Lorem Ipsum is placeholder text commonly used in the graphic, print, and publishing.', time: '5:10 PM' },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [filter_users, setFilterUsers] = useState([]);
 
   useEffect(() => {
     (async () => {
+      const logged_in_user_id = localStorage.getItem('logged_in_user_id');
+      setLoggedInUser(logged_in_user_id);
+
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please log in first.');
@@ -29,6 +30,7 @@ const HomePage = () => {
         const response = await fetchAllUsers(token);
         const { users, unseenMessage } = response;
         setUsers(users);
+        setFilterUsers(users);
         setUnseenMessages(unseenMessage);
       } catch (error) {
         setMessages([]);
@@ -73,9 +75,46 @@ const HomePage = () => {
     }
   };
 
-  console.log('Selected User ID:', selectedUserId, users);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket || !selectedUserId) return;
+
+    // Emit request every time selected user changes
+    socket.emit('getAllMessagesBetweenUsers', { chat_partner_id: selectedUserId });
+
+    // Define handler
+    const handleMessageListUpdate = (messages) => {
+      console.log("📥 Updated messages:", messages);
+      setMessages(messages);
+    };
+
+    // Listen to response
+    socket.on('getAllMessagesBetweenUsers', handleMessageListUpdate);
+
+    // Clean up to prevent duplicate listeners
+    return () => {
+      socket.off('getAllMessagesBetweenUsers', handleMessageListUpdate);
+    };
+  }, [selectedUserId]);
+
+  // On Handle User Search
+  const onHandleUserSearch = (input_text) => {
+    if (!input_text) {
+      setFilterUsers(users);
+      return;
+    }
+
+    const filter_data = users.filter(user =>
+      user.name.toLowerCase().includes(input_text.toLowerCase())
+    );
+
+    setFilterUsers(filter_data.length ? filter_data : users);
+    console.log("Filtered Data:", filter_data);
+  };
+
+
   const selectedUser = users.find(user => user._id === selectedUserId);
-  console.log('Selected User ID:', selectedUser, selectedUserId, users);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
@@ -91,12 +130,13 @@ const HomePage = () => {
             placeholder="Search here..."
             variant="standard"
             fullWidth
+            onChange={(e) => onHandleUserSearch(e.target.value)}
             InputProps={{ disableUnderline: true, style: { color: 'white' } }}
           />
         </Box>
 
         <List>
-          {users.map(user => (
+          {filter_users.length > 0 && filter_users.map(user => (
             <ListItem
               key={user._id}
               onClick={() => setSelectedUserId(user._id)}
@@ -141,23 +181,28 @@ const HomePage = () => {
           <Divider sx={{ background: '#333' }} />
 
           <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
-            {messages && messages.map((msg, index) => (
-              <Box key={index} sx={{ textAlign: msg.senderId === 1 ? 'right' : 'left', mb: 2 }}>
-                <Paper
-                  sx={{
-                    display: 'inline-block',
-                    px: 2,
-                    py: 1,
-                    borderRadius: 2,
-                    backgroundColor: msg.senderId === 1 ? '#6e56cf' : '#3a3a4f',
-                    color: '#fff'
-                  }}
-                >
-                  <Typography>{msg.content}</Typography>
-                </Paper>
-                <Typography variant="caption" color="gray" sx={{ mt: 0.5 }}>{msg.time}</Typography>
-              </Box>
-            ))}
+            {messages.length > 0 && messages.map((msg, index) => {
+              const isOwnMessage = msg.sender_id === logged_in_user;
+              return (
+                <Box key={index} sx={{ textAlign: isOwnMessage ? 'right' : 'left', mb: 2 }}>
+                  <Paper
+                    sx={{
+                      display: 'inline-block',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
+                      backgroundColor: isOwnMessage ? '#6e56cf' : '#3a3a4f',
+                      color: '#fff',
+                    }}
+                  >
+                    <Typography>{msg.content}</Typography>
+                  </Paper>
+                  <Typography variant="caption" color="gray" sx={{ mt: 0.5 }}>
+                    {msg.time}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
 
           <Divider sx={{ background: '#333' }} />

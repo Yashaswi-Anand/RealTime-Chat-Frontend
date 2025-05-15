@@ -35,3 +35,13 @@ export const fetchAllUsers = async (token) => {
     });
     return response.data.data; // contains users and unseenMessage
 };
+
+export const sendMessage = async (messageData) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.post('http://localhost:9500/messages/v1/send_message', messageData, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
+}
