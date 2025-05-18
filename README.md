@@ -26,19 +26,19 @@ This application is a just chat application
 
 ## Project Demo
 # Register
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Register.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/Register.png)
 # Login 
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Login.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/Login.png)
 # Home Page
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/HomePage.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/HomePage.png)
 # Partner 
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/PartherConnected.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/PartherConnected.png)
 # Typing 
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Typing.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/Typing.png)
 # Online 
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Online.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/Online.png)
 # View
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/View.png)
+![image](https://github.com/Yashaswi-Anand/RealTime-Chat-Frontend/blob/master/screenshots/View.png)
 
 ## Deployment
 - Netify (React Server)
