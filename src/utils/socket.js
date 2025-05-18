@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
-// let api = 'https://real-time-chat-application-snp1.onrender.com';
-let api = 'http://localhost:9500';
+let api = 'https://real-time-chat-application-snp1.onrender.com';
+// let api = 'http://localhost:9500';
 let socket = null;
 
 export const connectSocket = (user_id) => {
