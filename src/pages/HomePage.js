@@ -163,8 +163,15 @@ const HomePage = () => {
       {/* Sidebar */}
       <Box sx={{ width: '20%', background: '#141416', color: '#fff', p: 2 }}>
         <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box component="span" sx={{ fontWeight: 'bold', color: '#b57bff' }}>💬 Real Chat</Box>
+          <Box component="span" fontWeight="bold"
+            sx={{
+              background: 'linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>💬 Real Insta Chat</Box>
         </Typography>
+
+        <Divider sx={{background: 'white', marginBottom: 2}}/>
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
           <SearchIcon sx={{ color: 'gray' }} />
@@ -238,7 +245,7 @@ const HomePage = () => {
             </Box>
           </Box>
 
-          <Divider sx={{ background: '#3333' }} />
+          <Divider sx={{ background: 'white', marginBottom: 2, marginTop: 1 }} />
 
           <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
             {messages.length > 0 && messages.map((msg, index) => {
