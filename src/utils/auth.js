@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { connectSocket } from './socket';
-const api = 'http://localhost:9500';
+// const api = 'http://localhost:9500';
+let api = 'https://real-time-chat-application-snp1.onrender.com';
 
 export const loginUser = async (user_data) => {
     try {
