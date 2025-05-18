@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Typography, TextField, List, ListItem, ListItemAvatar, ListItemText, Avatar, Badge, IconButton, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, List, ListItem, ListItemAvatar, ListItemText, Avatar, Badge, IconButton, Paper, Divider, useTheme, useMediaQuery } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SearchIcon from '@mui/icons-material/Search';
 import { getSocket } from '../utils/socket';
 import { fetchAllUsers } from '../utils/auth';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const HomePage = () => {
   const [users, setUsers] = useState([]);
@@ -16,6 +17,8 @@ const HomePage = () => {
   const [filter_users, setFilterUsers] = useState([]);
   const typingTimeoutRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     (async () => {
@@ -159,9 +162,17 @@ const HomePage = () => {
   const selectedUser = users.find(user => user._id === selectedUserId);
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
-      {/* Sidebar */}
-      <Box sx={{ width: '20%', background: '#141416', color: '#fff', p: 2 }}>
+  <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
+    {/* Show Sidebar */}
+    {(!isMobile || (isMobile && !selectedUserId)) && (
+      <Box sx={{
+        width: isMobile ? '100%' : '20%',
+        background: '#141416',
+        color: '#fff',
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box component="span" fontWeight="bold"
             sx={{
@@ -171,7 +182,7 @@ const HomePage = () => {
             }}>💬 Real Insta Chat</Box>
         </Typography>
 
-        <Divider sx={{background: 'white', marginBottom: 2}}/>
+        <Divider sx={{ background: 'white', marginBottom: 2 }} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
           <SearchIcon sx={{ color: 'gray' }} />
@@ -217,38 +228,43 @@ const HomePage = () => {
           ))}
         </List>
       </Box>
+    )}
 
-      {/* Chat Window */}
-      {selectedUserId ?
-        <Box sx={{ flexGrow: 1, background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', p: 2, display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{
-            // flexGrow: 1,
-            // background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} />}
-              <Box>
-                <Typography variant="h6" sx={{ color: '#fff' }}>
-                  {selectedUser?.name}
-                  {selectedUser && onlineUsers.includes(selectedUser._id) && (
-                    <Typography component="span" sx={{ color: 'limegreen', ml: 1 }}>●</Typography>
-                  )}
-                </Typography>
-                {isTyping && (
-                  <Typography color="#b57bff" variant="caption" style={{ marginLeft: '-25px' }}>
-                    Typing...
-                  </Typography>
+    {/* Show Chat Window */}
+    {(!isMobile || (isMobile && selectedUserId)) && (
+      selectedUserId ? (
+        <Box sx={{
+          flexGrow: 1,
+          background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)',
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          width: isMobile ? '100%' : '80%'
+        }}>
+          {/* Top Bar */}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+            <Box>{isMobile && <ArrowBackIcon onClick={() => setSelectedUserId(null)} sx={{marginRight: 2, color: '#fff'}}/>}</Box>
+          {selectedUser && <Avatar src={selectedUser.avatar} sx={{ mr: 2 }} fontSize={'small'} />}
+            <Box>
+              <Typography variant="h6" sx={{ color: '#fff' }}>
+                {selectedUser?.name}
+                {selectedUser && onlineUsers.includes(selectedUser._id) && (
+                  <Typography component="span" sx={{ color: 'limegreen', ml: 1 }}>●</Typography>
                 )}
-              </Box>
+              </Typography>
+              {isTyping && (
+                <Typography color="#b57bff" variant="caption" style={{ marginLeft: '-25px' }}>
+                  Typing...
+                </Typography>
+              )}
             </Box>
           </Box>
 
           <Divider sx={{ background: 'white', marginBottom: 2, marginTop: 1 }} />
 
+          {/* Messages */}
           <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 2 }}>
-            {messages.length > 0 && messages.map((msg, index) => {
+            {messages.map((msg, index) => {
               const isOwnMessage = msg.sender_id === logged_in_user;
               return (
                 <Box key={index} sx={{ textAlign: isOwnMessage ? 'right' : 'left', mb: 2 }}>
@@ -274,6 +290,7 @@ const HomePage = () => {
 
           <Divider sx={{ background: '#333' }} />
 
+          {/* Input Box */}
           <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, backgroundColor: '#2b2b38', px: 2, borderRadius: 2 }}>
             <TextField
               fullWidth
@@ -288,13 +305,17 @@ const HomePage = () => {
             </IconButton>
           </Box>
         </Box>
-        : <Box sx={{ background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h5" sx={{ color: '#fff', textAlign: 'center', mt: 5 }}>
+      ) : !isMobile ? (
+        <Box sx={{ background: 'linear-gradient(135deg, #1f1f2b, #2f2f40)', flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="h5" sx={{ color: '#fff', textAlign: 'center' }}>
             Select a user to start chatting!
           </Typography>
-        </Box>}
-    </Box>
-  );
+        </Box>
+      ) : null
+    )}
+  </Box>
+);
+
 };
 
 export default HomePage;
