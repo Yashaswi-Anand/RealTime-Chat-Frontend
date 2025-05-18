@@ -17,24 +17,28 @@ This application is a just chat application
 - When a user goes online, display a status message: 'User is online.
 - When a user starts typing, show an indicator in the chat: 'User is typing...
 
-## Routes and how to start
-- Go to link: [Project Link](https://real-time-chat-application-snp1.onrender.com)
-- Add habits and view habits:  /habits
-- view all past 7 days habits: /report
-
 # Tech
-- Nodejs
-- Expressjs
-- EJS
+- ReactJS
+- NodeJs
+- ExpressJs
+- Socket.io
 - MongoDB
 
 ## Project Demo
-# Login & Logout Page
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/login.png)
-# Habits Page
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/habits.png)
-# Weekly Report Page
-![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/report.png)
+# Register
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Register.png)
+# Login 
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Login.png)
+# Home Page
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/HomePage.png)
+# Partner 
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/PartherConnected.png)
+# Typing 
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Typing.png)
+# Online 
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/Online.png)
+# View
+![image](https://github.com/Yashaswi-Anand/Habit-Tracker/blob/master/screenshots/View.png)
 
 ## Deployment
 - Netify (React Server)
