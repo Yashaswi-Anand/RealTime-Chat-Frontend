@@ -2,7 +2,7 @@
 
 ## _Fullstack app with Nodejs & ReactJS._
 
-This application is a just chat application
+This project implements a real-time one-to-one chat application using ReactJs, NodeJs, Socket.IO, and MongoDB. It enables users to send and receive messages instantly. The application tracks user presence—displaying "User is online" when active and "User is offline" upon disconnection. It also includes typing indicators; when a user begins typing, the other user sees "User is typing...". The backend, built with Node.js and Socket.IO, handles real-time communication and user events, while MongoDB stores chat data. The frontend, built with ReactJs, provides a clean interface for messaging, online/offline status updates, and typing notifications.
 
 ## Project Link
 - Frontend: https://real-time-chat-application-snp1.onrender.com
