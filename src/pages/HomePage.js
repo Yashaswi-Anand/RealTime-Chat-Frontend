@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Typography, TextField, List, ListItem, ListItemAvatar, ListItemText, Avatar, Badge, IconButton, Paper, Divider } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,7 +24,7 @@ const HomePage = () => {
 
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please log in first.');
+        window.location.href = '/login';
         return;
       }
 
@@ -36,7 +36,12 @@ const HomePage = () => {
         setUnseenMessages(unseenMessage);
       } catch (error) {
         setMessages([]);
-        console.error('Failed to fetch users:', error);
+        console.error('Failed to fetch users:', error.status);
+        if (error.status === 401) {
+          alert('Session expired. Please log in again.');
+          localStorage.clear()
+          window.location.href = '/login';
+        }
       }
     })();
   }, []);
@@ -156,7 +161,7 @@ const HomePage = () => {
   return (
     <Box sx={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
       {/* Sidebar */}
-      <Box sx={{ width: 300, background: '#141416', color: '#fff', p: 2 }}>
+      <Box sx={{ width: '20%', background: '#141416', color: '#fff', p: 2 }}>
         <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box component="span" sx={{ fontWeight: 'bold', color: '#b57bff' }}>💬 Real Chat</Box>
         </Typography>
